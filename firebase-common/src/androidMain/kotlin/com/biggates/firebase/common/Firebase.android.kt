@@ -16,9 +16,11 @@ actual fun Firebase.app(name: String): FirebaseApp {
     return FirebaseApp(AndroidFirebaseApp.getInstance(name))
 }
 
-actual class FirebaseApp internal constructor(private val delegate: AndroidFirebaseApp) {
-    actual val name: String get() = delegate.name
-    actual val options: FirebaseOptions = delegate.options.let { option ->
+actual class FirebaseApp internal constructor(
+    private val android: AndroidFirebaseApp
+) {
+    actual val name: String get() = android.name
+    actual val options: FirebaseOptions = android.options.let { option ->
         FirebaseOptions(
             applicationId = option.applicationId,
             apiKey = option.apiKey,
@@ -31,21 +33,21 @@ actual class FirebaseApp internal constructor(private val delegate: AndroidFireb
     }
 
     actual var dataCollectionDefaultEnabled: Boolean?
-        get() = delegate.isDataCollectionDefaultEnabled
-        set(v) { delegate.setDataCollectionDefaultEnabled(v) }
+        get() = android.isDataCollectionDefaultEnabled
+        set(v) { android.setDataCollectionDefaultEnabled(v) }
 
     actual var automaticResourceManagementEnabled: Boolean
         get() = false
-        set(v) { delegate.setAutomaticResourceManagementEnabled(v) }
+        set(v) { android.setAutomaticResourceManagementEnabled(v) }
 
-    actual val persistenceKey: String? get() = delegate.persistenceKey
+    actual val persistenceKey: String? get() = android.persistenceKey
 
     actual suspend fun delete(): Boolean = suspendCoroutine { continuation ->
         try {
-            val appName = delegate.name
-            delegate.delete()
+            val appName = android.name
+            android.delete()
 
-            val stillExists = AndroidFirebaseApp.getApps(delegate.applicationContext)
+            val stillExists = AndroidFirebaseApp.getApps(android.applicationContext)
                 .any { it.name == appName }
 
             continuation.resume(!stillExists)

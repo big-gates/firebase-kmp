@@ -55,7 +55,6 @@ data class FirebaseOptions(
     val authDomain: String? = null,
 )
 
-/** Android: google-services.json 기반 자동 초기화 (iOS는 context 무시) */
 expect fun Firebase.initializeApp(context: PlatformContext): FirebaseApp
 
 expect fun Firebase.initializeApp(context: PlatformContext, options: FirebaseOptions): FirebaseApp

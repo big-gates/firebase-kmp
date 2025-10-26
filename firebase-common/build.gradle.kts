@@ -1,18 +1,34 @@
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.cocoapods)
     alias(libs.plugins.mavenPublish)
 }
 
 kotlin {
-    @Suppress("OPT_IN_USAGE")
-    androidTarget {
-        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
-        unitTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
-        publishLibraryVariants()
+    jvmToolchain(17)
+
+    androidLibrary {
+        namespace = "com.biggates.firebase.common"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+
+        compilations.configureEach {
+            compilerOptions.configure {
+                jvmTarget.set(JvmTarget.JVM_17)
+            }
+        }
+
+        withHostTestBuilder {
+        }
+
+        withDeviceTestBuilder {
+            sourceSetTreeName = "test"
+        }.configure {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
     }
 
     iosArm64()
@@ -45,27 +61,15 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(project.dependencies.platform(libs.firebase.bom))
-            api(libs.google.firebase.common)
+            api(libs.firebase.common)
         }
 
         commonMain.dependencies {
-            // put your Multiplatform dependencies here
+            implementation(libs.kotlinx.coroutines.core)
         }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
-    }
-}
-
-android {
-    namespace = "com.biggates.firebase.common"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
     }
 }

@@ -13,13 +13,13 @@ actual fun Firebase.app(name: String): FirebaseApp {
     return FirebaseApp(FIRApp.appNamed(name)!!)
 }
 actual class FirebaseApp internal constructor(
-    private val delegate: FIRApp
+    private val ios: FIRApp
 ) {
     actual val name: String
-        get() = delegate.name
+        get() = ios.name
 
     actual val options: FirebaseOptions
-        get() = delegate.options.let { option ->
+        get() = ios.options.let { option ->
             FirebaseOptions(
                 applicationId = option.bundleID,
                 apiKey = option.APIKey!!,
@@ -49,7 +49,7 @@ actual class FirebaseApp internal constructor(
         get() = "$name+${options.applicationId}"
 
     actual suspend fun delete(): Boolean = suspendCoroutine { continuation ->
-        delegate.deleteApp { success ->
+        ios.deleteApp { success ->
             continuation.resume(success)
         }
     }

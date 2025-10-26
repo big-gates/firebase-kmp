@@ -18,7 +18,7 @@ maven-publish = "0.34.0"
 kotlinStdlib = "2.2.20"
 runner = "1.7.0"
 core = "1.7.0"
-firebase-bom = "33.15.0"
+firebase-bom = "34.4.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -36,7 +36,9 @@ kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", versio
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
-google-firebase-common = { module = "com.google.firebase:firebase-common"}
+firebase-common = { module = "com.google.firebase:firebase-common"}
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 
 [plugins]
 cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
