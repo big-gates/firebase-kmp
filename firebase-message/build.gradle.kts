@@ -74,3 +74,13 @@ kotlin {
         }
     }
 }
+
+publishing {
+    publications.withType<MavenPublication>().configureEach {
+        artifactId = "firebase-message"
+        pom {
+            name.set(artifactId)
+            description.set("KMP Firebase message")
+        }
+    }
+}

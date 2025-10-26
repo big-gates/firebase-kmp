@@ -73,3 +73,13 @@ kotlin {
         }
     }
 }
+
+publishing {
+    publications.withType<MavenPublication>().configureEach {
+        artifactId = "firebase-common"
+        pom {
+            name.set(artifactId)
+            description.set("KMP Firebase common")
+        }
+    }
+}
