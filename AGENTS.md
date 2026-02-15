@@ -33,7 +33,7 @@ Reference module guides:
 ## Platform Interop Rules
 1. Android code should use Firebase Android SDK with the module's BOM-based dependency setup.
 2. iOS code should use CocoaPods interop APIs declared in each module.
-3. JVM code should be explicit about capability limits where Firebase client SDK parity does not exist.
+3. JVM code should use explicit runtime configuration when backed by Admin/Cloud SDKs, and document behavior differences from mobile client SDKs.
 4. Avoid introducing new force unwrap patterns on iOS; handle nullable results defensively.
 5. When adding option/config fields, update all relevant platform mappings in the same change.
 

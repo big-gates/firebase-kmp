@@ -79,6 +79,10 @@ kotlin {
             implementation(libs.kotlin.test)
         }
 
+        jvmMain.dependencies {
+            implementation(libs.firebase.admin)
+        }
+
         getByName("androidDeviceTest") {
             dependencies {
                 implementation(libs.androidx.runner)

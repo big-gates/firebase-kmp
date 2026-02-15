@@ -53,6 +53,13 @@ data class FirebaseOptions(
 
     /** The auth domain. */
     val authDomain: String? = null,
+
+    /**
+     * JVM-only option. Absolute path to a Firebase Admin service account JSON.
+     *
+     * If null on JVM, Application Default Credentials are used.
+     */
+    val serviceAccountPath: String? = null,
 )
 
 expect fun Firebase.initializeApp(context: PlatformContext): FirebaseApp

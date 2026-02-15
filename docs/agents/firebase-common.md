@@ -44,6 +44,8 @@ Do not add service-specific APIs here (Messaging/Auth/Firestore/etc.).
 1. Keep JVM implementation deterministic and explicit; do not imply unsupported Firebase client behavior works on JVM.
 2. `initializeApp(context)` should not auto-discover config on JVM; require explicit options-based initialization.
 3. Maintain app registry behavior (`initializeApp`, `app`, `getApps`, `delete`) for testability and API consistency.
+4. Initialize Firebase Admin SDK in JVM path during `initializeApp(context, options)`.
+5. Keep JVM-only options (`serviceAccountPath`) documented and backward compatible.
 
 ## API And Compatibility Rules
 1. Keep public names stable (`Firebase`, `FirebaseApp`, `FirebaseOptions`, `initializeApp`, `getApps`).

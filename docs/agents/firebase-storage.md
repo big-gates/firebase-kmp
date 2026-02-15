@@ -36,9 +36,9 @@
 3. Propagate native errors as exceptions; avoid silent fallback for failure states.
 
 ## JVM Rules
-1. JVM target currently has no official Firebase Storage client SDK parity for this wrapper.
-2. Unsupported operations must fail clearly (`UnsupportedOperationException`) instead of no-op.
-3. If JVM support scope expands, update this guide and shared API docs together.
+1. JVM target is backed by Google Cloud Storage client via Firebase Admin dependency and requires explicit runtime configuration.
+2. Configure Admin SDK through `firebase-common` initialization (`Firebase.initializeApp(...)`) and include `storageBucket` in `FirebaseOptions`.
+3. Keep URL/path parsing and download URL behavior explicit, because JVM storage semantics differ from mobile client SDK internals.
 
 ## API And Compatibility Rules
 1. Preserve `Firebase.storage` entry point and storage reference semantics.

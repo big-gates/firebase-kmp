@@ -19,6 +19,7 @@ kotlinStdlib = "2.2.20"
 runner = "1.7.0"
 core = "1.7.0"
 firebase-bom = "34.4.0"
+firebase-admin = "9.7.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -39,6 +40,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-common = { module = "com.google.firebase:firebase-common"}
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
+firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase-admin" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 
 [plugins]

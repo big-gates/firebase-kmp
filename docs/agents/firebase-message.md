@@ -36,9 +36,10 @@
 4. Keep token nullability behavior explicit and documented.
 
 ## JVM Rules
-1. JVM target currently has no official Firebase Messaging client SDK parity; keep behavior explicit.
-2. Unsupported messaging operations must fail clearly (`UnsupportedOperationException`) instead of silent no-op.
-3. If JVM support scope expands in the future, update this guide and shared API docs together.
+1. JVM target is backed by Firebase Admin SDK and requires explicit runtime configuration.
+2. Configure Admin SDK through `firebase-common` initialization (`Firebase.initializeApp(...)`) before using Messaging APIs.
+3. Provide registration token via `Firebase.setMessagingRegistrationToken(...)` because JVM cannot mint client FCM tokens.
+4. Keep JVM behavior explicit about server-side limitations versus mobile client SDK semantics.
 
 ## Manifest And Tests
 1. Keep `firebase-message/src/androidMain/AndroidManifest.xml` minimal unless messaging integration requires declarations.
