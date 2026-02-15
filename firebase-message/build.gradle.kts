@@ -31,6 +31,12 @@ kotlin {
         }
     }
 
+    jvm {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
+
     iosX64()
     iosArm64()
     iosSimulatorArm64()
@@ -60,8 +66,8 @@ kotlin {
             }
         }
         androidMain.dependencies {
-            implementation(project.dependencies.platform(libs.firebase.bom))
-            implementation(libs.firebase.messaging)
+            api(project.dependencies.platform(libs.firebase.bom))
+            api(libs.firebase.messaging)
         }
 
         commonMain.dependencies {
@@ -72,15 +78,58 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+
+        getByName("androidDeviceTest") {
+            dependencies {
+                implementation(libs.androidx.runner)
+                implementation(libs.androidx.core)
+                implementation(libs.androidx.testExt.junit)
+            }
+        }
     }
 }
 
-publishing {
-    publications.withType<MavenPublication>().configureEach {
-        artifactId = "firebase-message"
-        pom {
-            name.set(artifactId)
-            description.set("KMP Firebase message")
+mavenPublishing {
+    publishToMavenCentral()
+
+    val isLocalPublish = gradle.startParameter.taskNames.any { it.contains("publishToMavenLocal") }
+    if (!isLocalPublish) {
+        signAllPublications()
+    }
+
+    coordinates(
+        groupId = "io.github.big-gates",
+        artifactId = "firebase-message",
+        version = "0.0.1",
+    )
+
+    pom {
+        name = "Firebase Message (Kotlin Multiplatform)"
+        description = "KMP bindings/wrappers for Firebase Message (Android/iOS/JVM)."
+        inceptionYear = "2025"
+        url = "https://github.com/big-gates/firebase-kmp"
+
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+            }
+        }
+
+        developers {
+            developer {
+                id = "big-gates"
+                name = "Big Gates"
+                email = "biggatescorp@gamil.com"
+                url = "https://github.com/big-gates"
+            }
+        }
+
+        scm {
+            url = "https://github.com/big-gates/firebase-kmp"
+            connection = "scm:git:https://github.com/big-gates/firebase-kmp.git"
+            developerConnection = "scm:git:ssh://git@github.com/big-gates/firebase-kmp.git"
         }
     }
 }

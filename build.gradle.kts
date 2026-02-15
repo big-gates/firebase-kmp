@@ -7,7 +7,3 @@ plugins {
     alias(libs.plugins.androidKotlinMultiplatformLibrary) apply false
     alias(libs.plugins.androidLint) apply false
 }
-
-allprojects {
-    group = "com.github.big-gates"
-}

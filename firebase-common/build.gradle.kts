@@ -31,6 +31,12 @@ kotlin {
         }
     }
 
+    jvm {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
+
     iosArm64()
     iosX64()
     iosSimulatorArm64()
@@ -60,7 +66,7 @@ kotlin {
             }
         }
         androidMain.dependencies {
-            implementation(project.dependencies.platform(libs.firebase.bom))
+            api(project.dependencies.platform(libs.firebase.bom))
             api(libs.firebase.common)
         }
 
@@ -74,12 +80,47 @@ kotlin {
     }
 }
 
-publishing {
-    publications.withType<MavenPublication>().configureEach {
-        artifactId = "firebase-common"
-        pom {
-            name.set(artifactId)
-            description.set("KMP Firebase common")
+mavenPublishing {
+    publishToMavenCentral()
+
+    val isLocalPublish = gradle.startParameter.taskNames.any { it.contains("publishToMavenLocal") }
+    if (!isLocalPublish) {
+        signAllPublications()
+    }
+
+    coordinates(
+        groupId = "io.github.big-gates",
+        artifactId = "firebase-common",
+        version = "0.0.1",
+    )
+
+    pom {
+        name = "Firebase Common (Kotlin Multiplatform)"
+        description = "KMP bindings/wrappers for Firebase Core (Android/iOS/JVM)."
+        inceptionYear = "2025"
+        url = "https://github.com/big-gates/firebase-kmp"
+
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+            }
+        }
+
+        developers {
+            developer {
+                id = "big-gates"
+                name = "Big Gates"
+                email = "biggatescorp@gamil.com"
+                url = "https://github.com/big-gates"
+            }
+        }
+
+        scm {
+            url = "https://github.com/big-gates/firebase-kmp"
+            connection = "scm:git:https://github.com/big-gates/firebase-kmp.git"
+            developerConnection = "scm:git:ssh://git@github.com/big-gates/firebase-kmp.git"
         }
     }
 }
