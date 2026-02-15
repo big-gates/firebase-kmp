@@ -13,7 +13,7 @@
 ## Key Files
 - `firebase-storage/src/commonMain/kotlin/com/biggates/firebase/storage/Storage.kt`
 - `firebase-storage/src/androidMain/kotlin/com/biggates/firebase/storage/Storage.android.kt`
-- `firebase-storage/src/iosMain/kotlin/com/biggates/firebase/storage/Storage.ios.kt`
+- `firebase-storage/src/appleMain/kotlin/com/biggates/firebase/storage/Storage.apple.kt`
 - `firebase-storage/src/jvmMain/kotlin/com/biggates/firebase/storage/Storage.jvm.kt`
 - `firebase-storage/build.gradle.kts`
 - `docs/public-api/firebase-storage.md`
@@ -25,7 +25,7 @@
 
 ## Change Workflow
 1. Start in `commonMain` with shared API changes.
-2. Implement Android, iOS, and JVM `actual` code in the same change.
+2. Implement Android, Apple, and JVM `actual` code in the same change.
 3. Keep API parity for:
 - `Firebase.storage`
 - `Firebase.storage(url)`
@@ -40,8 +40,8 @@
 2. Bridge Task APIs with coroutines (`await`) for suspend functions.
 3. Preserve predictable mapping between shared `StorageReference` and Android SDK references.
 
-## iOS Rules
-1. Use CocoaPods `FirebaseStorage` interop only in `iosMain`.
+## Apple Rules
+1. Use CocoaPods `FirebaseStorage` interop in Apple source sets.
 2. Bridge callback APIs with cancellable coroutines.
 3. Propagate native errors as exceptions; avoid silent fallback for failure states.
 

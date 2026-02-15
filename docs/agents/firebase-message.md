@@ -13,7 +13,7 @@
 ## Key Files
 - `firebase-message/src/commonMain/kotlin/com/biggates/firebase/message/Messaging.kt`
 - `firebase-message/src/androidMain/kotlin/com/biggates/firebase/message/Messaging.android.kt`
-- `firebase-message/src/iosMain/kotlin/com/biggates/firebase/message/Messaging.ios.kt`
+- `firebase-message/src/appleMain/kotlin/com/biggates/firebase/message/Messaging.apple.kt`
 - `firebase-message/src/jvmMain/kotlin/com/biggates/firebase/message/Messaging.jvm.kt`
 - `firebase-message/build.gradle.kts`
 - `docs/public-api/firebase-message.md`
@@ -25,7 +25,7 @@
 
 ## Change Workflow
 1. Start in `commonMain` with shared API changes.
-2. Implement Android, iOS, and JVM `actual` code in the same change.
+2. Implement Android, Apple, and JVM `actual` code in the same change.
 3. Keep function parity for:
 - `autoInitEnabled`
 - `subscribeToTopic`
@@ -38,8 +38,8 @@
 2. Bridge Task APIs with coroutines (`await`) for suspend functions.
 3. Keep topic APIs lightweight and non-blocking.
 
-## iOS Rules
-1. Use CocoaPods `FirebaseMessaging` interop only in `iosMain`.
+## Apple Rules
+1. Use CocoaPods `FirebaseMessaging` interop in Apple source sets.
 2. Bridge callback APIs with cancellable coroutines.
 3. Propagate errors with clear exceptions rather than swallowing them.
 4. Keep token nullability behavior explicit and documented.

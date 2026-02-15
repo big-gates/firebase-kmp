@@ -40,9 +40,22 @@ kotlin {
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+    macosArm64()
+    macosX64()
+    tvosArm64()
+    tvosX64()
+    tvosSimulatorArm64()
+    watchosArm32()
+    watchosArm64()
+    watchosDeviceArm64()
+    watchosSimulatorArm64()
+    watchosX64()
 
     cocoapods {
         ios.deploymentTarget = libs.versions.ios.deploymentTarget.get()
+        osx.deploymentTarget = libs.versions.macos.deploymentTarget.get()
+        tvos.deploymentTarget = libs.versions.tvos.deploymentTarget.get()
+        watchos.deploymentTarget = libs.versions.watchos.deploymentTarget.get()
         framework {
             baseName = "FirebaseMessaging"
         }
@@ -60,6 +73,7 @@ kotlin {
                     || name.lowercase().contains("apple")
                     || name.lowercase().contains("tvos")
                     || name.lowercase().contains("macos")
+                    || name.lowercase().contains("watchos")
                 ) {
                     optIn("kotlinx.cinterop.ExperimentalForeignApi")
                 }
@@ -110,7 +124,7 @@ mavenPublishing {
 
     pom {
         name = "Firebase Message (Kotlin Multiplatform)"
-        description = "KMP bindings/wrappers for Firebase Message (Android/iOS/JVM)."
+        description = "KMP bindings/wrappers for Firebase Message (Android/Apple/JVM)."
         inceptionYear = "2025"
         url = "https://github.com/big-gates/firebase-kmp"
 

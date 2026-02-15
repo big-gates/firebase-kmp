@@ -4,7 +4,7 @@
 `firebase-common` provides multiplatform wrappers for Firebase app lifecycle and configuration (`Firebase`, `FirebaseApp`, `FirebaseOptions`).
 
 ## Coverage Target
-1. This module is considered complete only when Firebase Core app/bootstrap API surface is near parity across Android/iOS/JVM.
+1. This module is considered complete only when Firebase Core app/bootstrap API surface is near parity across Android/Apple/JVM.
 2. JVM Admin initialization and option mapping must remain compatible with growth in downstream modules (`message`, `storage`, future products).
 3. Public API coverage target for this module is 100% within Firebase Core scope, with explicit caveats only when official parity is impossible.
 4. Update README coverage status whenever `firebase-common` public API expands.
@@ -13,7 +13,7 @@
 ## Key Files
 - `firebase-common/src/commonMain/kotlin/com/biggates/firebase/common/Firebase.kt`
 - `firebase-common/src/androidMain/kotlin/com/biggates/firebase/common/Firebase.android.kt`
-- `firebase-common/src/iosMain/kotlin/com/biggates/firebase/common/Firebase.ios.kt`
+- `firebase-common/src/appleMain/kotlin/com/biggates/firebase/common/Firebase.apple.kt`
 - `firebase-common/src/jvmMain/kotlin/com/biggates/firebase/common/Firebase.jvm.kt`
 - `firebase-common/build.gradle.kts`
 - `docs/public-api/firebase-common.md`
@@ -29,10 +29,10 @@ Do not add service-specific APIs here (Messaging/Auth/Firestore/etc.).
 
 ## Change Workflow
 1. Edit shared API first in `commonMain`.
-2. Implement matching `actual` behavior for Android, iOS, and JVM in the same PR.
+2. Implement matching `actual` behavior for Android, Apple, and JVM in the same PR.
 3. If you add fields to `FirebaseOptions`, update:
 - Android `toAndroid()` mapping.
-- iOS `toIos()` mapping.
+- Apple `toIos()` mapping.
 - JVM app-state handling if needed.
 - Any KDoc describing option semantics.
 
@@ -42,11 +42,11 @@ Do not add service-specific APIs here (Messaging/Auth/Firestore/etc.).
 3. Keep async bridge logic coroutine-friendly.
 4. Preserve current semantics of `delete()` (boolean success signal).
 
-## iOS Rules
+## Apple Rules
 1. `PlatformContext` is a placeholder type; do not assume app-level context exists.
-2. Use CocoaPods `FirebaseCore` interop only inside `iosMain`.
+2. Use CocoaPods `FirebaseCore` interop in Apple source sets.
 3. Avoid adding new force unwraps (`!!`) for optional CocoaPods values; prefer defensive handling.
-4. When iOS lacks a direct equivalent to Android behavior, document fallback behavior in KDoc.
+4. When Apple platforms lack a direct equivalent to Android behavior, document fallback behavior in KDoc.
 
 ## JVM Rules
 1. Keep JVM implementation deterministic and explicit; do not imply unsupported Firebase client behavior works on JVM.

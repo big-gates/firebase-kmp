@@ -7,7 +7,7 @@ These instructions apply to the whole repository. Module-specific rules in `docs
 `firebase-kmp` is an open-source Kotlin Multiplatform wrapper around official Firebase SDKs, so Firebase features can be used from shared KMP APIs.
 
 ## Long-Term Goal
-1. Final goal: 100% Firebase API compatibility and 100% public API coverage for KMP (Android/iOS/JVM), with explicit platform caveats only when official SDK parity is impossible.
+1. Final goal: 100% Firebase API compatibility and 100% public API coverage for KMP (Android/Apple/JVM), with explicit platform caveats only when official SDK parity is impossible.
 2. Work should be planned and implemented toward full Firebase product-family coverage, not only currently available modules.
 3. Every public API expansion should move compatibility coverage forward in measurable terms.
 
@@ -38,8 +38,8 @@ Reference module guides:
 ## Core Engineering Rules
 1. Keep wrappers thin and predictable.
 2. Define shared API in `commonMain` first (`expect`, data models, extension properties/functions).
-3. Implement platform behavior in `androidMain`, `iosMain`, and `jvmMain`.
-4. Maintain Android/iOS/JVM behavior parity as much as possible. If parity is impossible, document the difference in KDoc and module docs.
+3. Implement platform behavior in `androidMain`, Apple source sets (`appleMain`/target mains), and `jvmMain`.
+4. Maintain Android/Apple/JVM behavior parity as much as possible. If parity is impossible, document the difference in KDoc and module docs.
 5. Do not add app-level/business logic to this library.
 
 ## API Design Rules
@@ -51,15 +51,15 @@ Reference module guides:
 
 ## Platform Interop Rules
 1. Android code should use Firebase Android SDK with the module's BOM-based dependency setup.
-2. iOS code should use CocoaPods interop APIs declared in each module.
+2. Apple-native code should use CocoaPods interop APIs declared in each module.
 3. JVM code should use explicit runtime configuration when backed by Admin/Cloud SDKs, and document behavior differences from mobile client SDKs.
-4. Avoid introducing new force unwrap patterns on iOS; handle nullable results defensively.
+4. Avoid introducing new force unwrap patterns in Apple source sets; handle nullable results defensively.
 5. When adding option/config fields, update all relevant platform mappings in the same change.
 
 ## Dependency And Build Rules
 1. Keep versions centralized in `gradle/libs.versions.toml`.
-2. Keep Android BOM and iOS CocoaPods versions aligned to a compatible Firebase generation.
-3. Maintain Kotlin Multiplatform target setup already present in each module (`android`, `jvm`, `iosX64`, `iosArm64`, `iosSimulatorArm64`).
+2. Keep Android BOM and Apple CocoaPods versions aligned to a compatible Firebase generation.
+3. Maintain Kotlin Multiplatform target setup already present in each module (`android`, `jvm`, `ios*`, `macos*`, `tvos*`, `watchos*`).
 4. Keep Java/Kotlin target compatibility at JVM 17 unless the project intentionally upgrades.
 
 ## Testing And Verification
@@ -73,7 +73,7 @@ Run checks for touched modules before submitting:
 
 When API surface or platform mapping changes:
 1. Add or update tests in relevant source sets.
-2. Validate compile targets at minimum (Android + iOS + JVM source sets).
+2. Validate compile targets at minimum (Android + Apple + JVM source sets).
 
 ## Publishing Rules
 1. Artifacts are published via `com.vanniktech.maven.publish`.

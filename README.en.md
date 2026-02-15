@@ -1,61 +1,62 @@
 # firebase-kmp
 
-Open-source Kotlin Multiplatform (Android/iOS/JVM) wrapper library for Firebase APIs.
+Open-source Kotlin Multiplatform (Android/Apple/JVM) wrapper library for Firebase APIs.
 
-## Modules
-- `firebase-common`: Firebase app initialization and app instance APIs
-- `firebase-message`: FCM topic/token APIs + Pub/Sub subscriber APIs (JVM-only)
-- `firebase-storage`: Cloud Storage reference APIs
+Language:
+- English (this file)
+- Korean: [`README.ko.md`](README.ko.md)
+
+## Why firebase-kmp?
+- Use Firebase from shared KMP code with Firebase-like APIs.
+- Keep Android, Apple, and JVM behavior aligned as much as possible.
+- Support JVM server-side workflows with Firebase Admin SDK.
+
+## Module Matrix
+
+| Module | Firebase Product | Current Scope | Public API Coverage | Status |
+| --- | --- | --- | --- | --- |
+| `firebase-common` | Core | App init, app instance, options, app registry | `21 / 25 = 84.0%` | `partial` |
+| `firebase-message` | Cloud Messaging | Topic/token APIs + JVM Pub/Sub consume/publish + JVM send APIs | `19 / 36 = 52.8%` | `partial` |
+| `firebase-storage` | Cloud Storage | Storage reference APIs + bytes/download/delete (see notes) | `13 / 31 = 41.9%` | `partial` |
 
 ## Targets
-- Android
-- iOS (`iosX64`, `iosArm64`, `iosSimulatorArm64`)
-- JVM
 
-## API Compatibility Coverage
+| Target | Support |
+| --- | --- |
+| Android | Yes |
+| Apple (`ios*`, `macos*`, `tvos*`, `watchos*`) | Yes |
+| JVM | Yes |
 
-Goal: Firebase API compatibility coverage and public API coverage to 100% for KMP (Android/iOS/JVM).
+Note:
+- visionOS target is planned once Firebase SDK parity and KMP interop stability are verified.
+
+## Compatibility Coverage (Updated: 2026-02-15)
+
+Goal:
+- `100%` Firebase API compatibility coverage for KMP.
+- `100%` public API coverage for each supported Firebase product module.
 
 Coverage model:
-- Product-family coverage = implemented product families / target product families
+- Product-family coverage = implemented Firebase product families / target product families
 - Public API coverage = implemented public APIs / target public APIs (per product, per platform)
-- API-depth status per implemented module = `not started`, `partial`, `near parity`, `parity`
+- API-depth status = `not started`, `partial`, `near parity`, `parity`
+
+Current snapshot:
+- Product-family coverage: `3 / 18 = 16.7%`
+- Public API catalog: [`docs/public-api/README.md`](docs/public-api/README.md)
+
+| Module | Coverage | Catalog |
+| --- | --- | --- |
+| `firebase-common` | `21 / 25 = 84.0%` | [`docs/public-api/firebase-common.md`](docs/public-api/firebase-common.md) |
+| `firebase-message` | `19 / 36 = 52.8%` | [`docs/public-api/firebase-message.md`](docs/public-api/firebase-message.md) |
+| `firebase-storage` | `13 / 31 = 41.9%` | [`docs/public-api/firebase-storage.md`](docs/public-api/firebase-storage.md) |
 
 Target product families (18):
-- Core
-- Cloud Messaging
-- Cloud Storage
-- Authentication
-- Cloud Firestore
-- Realtime Database
-- Cloud Functions
-- Analytics
-- Crashlytics
-- Performance Monitoring
-- Remote Config
-- App Check
-- In-App Messaging
-- Dynamic Links
-- Installations
-- ML
-- Data Connect
-- Vertex AI in Firebase
-
-Current status (updated: 2026-02-15):
-- Product-family coverage: `3 / 18 = 16.7%`
-- Public API catalog: `docs/public-api/README.md`
-- Public API coverage (module-level):
-- `firebase-common`: `21 / 25 = 84.0%` (`docs/public-api/firebase-common.md`)
-- `firebase-message`: `19 / 36 = 52.8%` (`docs/public-api/firebase-message.md`)
-- `firebase-storage`: `13 / 31 = 41.9%` (`docs/public-api/firebase-storage.md`)
-- Implemented:
-- `firebase-common` (Core): `partial`
-- `firebase-message` (Cloud Messaging + JVM Pub/Sub consume path): `partial`
-- `firebase-storage` (Cloud Storage): `partial`
+- Core, Cloud Messaging, Cloud Storage, Authentication, Cloud Firestore, Realtime Database, Cloud Functions, Analytics, Crashlytics, Performance Monitoring, Remote Config, App Check, In-App Messaging, Dynamic Links, Installations, ML, Data Connect, Vertex AI in Firebase
 
 ## Installation
 
-Maven coordinates (example version: `0.0.1`)
+Maven coordinates (example version: `0.0.1`):
 
 ```kotlin
 dependencies {
@@ -65,11 +66,9 @@ dependencies {
 }
 ```
 
-## Usage
+## Quick Start (JVM)
 
-### 1) Initialize Firebase (`firebase-common`)
-
-On JVM, Admin SDK is initialized as part of `Firebase.initializeApp(context, options)`.
+### 1) Initialize Firebase
 
 ```kotlin
 import com.biggates.firebase.common.Firebase
@@ -90,21 +89,14 @@ fun initFirebaseOnJvm() {
 }
 ```
 
-Notes:
-- Calling only `initializeApp(context)` on JVM fails. Use options-based initialization.
-- If `serviceAccountPath` is omitted, Application Default Credentials (ADC) are used.
-- `storageBucket` is required when using default `Firebase.storage`.
-
-### 2) Messaging on JVM (`firebase-message`)
-
-JVM cannot mint FCM registration tokens like mobile client SDKs, so set the token explicitly.
+### 2) Messaging (Topic + Token + FCM Send)
 
 ```kotlin
 import com.biggates.firebase.common.Firebase
-import com.biggates.firebase.message.messaging
-import com.biggates.firebase.message.setMessagingRegistrationToken
-import com.biggates.firebase.message.sendMessage
 import com.biggates.firebase.message.FirebaseJvmFcmMessage
+import com.biggates.firebase.message.messaging
+import com.biggates.firebase.message.sendMessage
+import com.biggates.firebase.message.setMessagingRegistrationToken
 
 suspend fun messagingJvmSample() {
     Firebase.messaging.autoInitEnabled = true
@@ -118,13 +110,13 @@ suspend fun messagingJvmSample() {
     Firebase.sendMessage(
         FirebaseJvmFcmMessage(
             topic = "news",
-            data = mapOf("source" to "jvm", "message" to "hello"),
+            data = mapOf("source" to "jvm", "message" to "hello")
         )
     )
 }
 ```
 
-### 3) Subscribe and process data on JVM (`firebase-message`, Pub/Sub)
+### 3) Pub/Sub Consume + Publish
 
 ```kotlin
 import com.biggates.firebase.common.Firebase
@@ -145,7 +137,6 @@ fun startJvmPubSub() {
         println("messageId=${message.messageId}")
         println("data=${message.dataUtf8}")
         println("attributes=${message.attributes}")
-
         FirebaseJvmAckDecision.ACK
     }
 
@@ -153,19 +144,14 @@ fun startJvmPubSub() {
         topicId = "news-topic",
         dataUtf8 = """{"type":"news","title":"hello from jvm"}""",
         attributes = mapOf("channel" to "backend"),
-        config = FirebaseJvmPubSubPublishConfig(endpoint = null),
+        config = FirebaseJvmPubSubPublishConfig(endpoint = null)
     )
 
     // subscription.stop()
 }
 ```
 
-Notes:
-- `projectId` must be set in `FirebaseOptions` during `Firebase.initializeApp(...)`.
-- The returned `FirebaseJvmPubSubSubscription` should be stopped gracefully on shutdown:
-  `subscription.stop()`.
-
-### 4) Storage on JVM (`firebase-storage`)
+### 4) Storage (Reference + Bytes)
 
 ```kotlin
 import com.biggates.firebase.common.Firebase
@@ -188,9 +174,25 @@ suspend fun storageJvmSample() {
 }
 ```
 
-## Verify Build
+## Important Notes
+
+- On JVM, calling only `initializeApp(context)` fails. Use `initializeApp(context, options)`.
+- If `serviceAccountPath` is omitted on JVM, ADC (Application Default Credentials) is used.
+- `projectId` is required for JVM Pub/Sub APIs.
+- `storageBucket` is required when using default `Firebase.storage` on JVM.
+- `StorageReference.putBytes(...)` is currently pending on iOS target.
+
+## Build Verification
 
 ```bash
 ./gradlew :firebase-common:check :firebase-message:check :firebase-storage:check
 ./gradlew :firebase-common:compileKotlinJvm :firebase-message:compileKotlinJvm :firebase-storage:compileKotlinJvm
 ```
+
+## Project Docs
+
+- Public API catalog: [`docs/public-api/README.md`](docs/public-api/README.md)
+- Repository agent guide: [`AGENTS.md`](AGENTS.md)
+- [`docs/agents/firebase-common.md`](docs/agents/firebase-common.md)
+- [`docs/agents/firebase-message.md`](docs/agents/firebase-message.md)
+- [`docs/agents/firebase-storage.md`](docs/agents/firebase-storage.md)
