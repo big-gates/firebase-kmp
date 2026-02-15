@@ -9,10 +9,12 @@ These instructions apply to the whole repository. Module-specific rules in `docs
 ## Active Modules
 - `firebase-common`: core Firebase app/bootstrap abstractions.
 - `firebase-message`: Firebase Cloud Messaging abstractions.
+- `firebase-storage`: Firebase Storage abstractions.
 
 Reference module guides:
 - `docs/agents/firebase-common.md`
 - `docs/agents/firebase-message.md`
+- `docs/agents/firebase-storage.md`
 
 ## Core Engineering Rules
 1. Keep wrappers thin and predictable.
@@ -45,8 +47,10 @@ Reference module guides:
 Run checks for touched modules before submitting:
 - `./gradlew :firebase-common:check`
 - `./gradlew :firebase-message:check`
+- `./gradlew :firebase-storage:check`
 - `./gradlew :firebase-common:compileKotlinJvm`
 - `./gradlew :firebase-message:compileKotlinJvm`
+- `./gradlew :firebase-storage:compileKotlinJvm`
 
 When API surface or platform mapping changes:
 1. Add or update tests in relevant source sets.
@@ -59,6 +63,7 @@ When API surface or platform mapping changes:
 4. Use local publish for validation when needed:
 - `./gradlew :firebase-common:publishToMavenLocal`
 - `./gradlew :firebase-message:publishToMavenLocal`
+- `./gradlew :firebase-storage:publishToMavenLocal`
 
 ## Documentation Maintenance
 1. Update `README.md` and affected files in `docs/agents/` whenever public APIs or setup flow changes.

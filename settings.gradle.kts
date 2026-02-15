@@ -34,3 +34,4 @@ plugins {
 
 include(":firebase-common")
 include(":firebase-message")
+include(":firebase-storage")
