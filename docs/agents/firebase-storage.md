@@ -3,12 +3,20 @@
 ## Module Purpose
 `firebase-storage` provides multiplatform wrappers for Firebase Cloud Storage operations (`Firebase.storage`, storage references, download URL, delete).
 
+## Coverage Target
+1. Long-term target is near parity with official Storage APIs per platform.
+2. Coverage should expand beyond current reference/download/delete subset in incremental, documented steps.
+3. Public API coverage target for this module is 100% within Storage scope, with explicit caveats only when official parity is impossible.
+4. Update README coverage status whenever Storage public API surface grows.
+5. Update `docs/public-api/firebase-storage.md` in the same change.
+
 ## Key Files
 - `firebase-storage/src/commonMain/kotlin/com/biggates/firebase/storage/Storage.kt`
 - `firebase-storage/src/androidMain/kotlin/com/biggates/firebase/storage/Storage.android.kt`
 - `firebase-storage/src/iosMain/kotlin/com/biggates/firebase/storage/Storage.ios.kt`
 - `firebase-storage/src/jvmMain/kotlin/com/biggates/firebase/storage/Storage.jvm.kt`
 - `firebase-storage/build.gradle.kts`
+- `docs/public-api/firebase-storage.md`
 
 ## Dependency Boundary
 1. This module depends on `firebase-common` for shared Firebase entrypoints.
@@ -22,6 +30,8 @@
 - `Firebase.storage`
 - `Firebase.storage(url)`
 - `StorageReference.child`
+- `StorageReference.putBytes`
+- `StorageReference.getBytes`
 - `StorageReference.getDownloadUrl`
 - `StorageReference.delete`
 

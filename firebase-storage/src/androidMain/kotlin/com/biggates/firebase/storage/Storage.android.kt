@@ -47,6 +47,14 @@ actual class StorageReference internal constructor(
         return StorageReference(android.child(path))
     }
 
+    actual suspend fun putBytes(bytes: ByteArray) {
+        android.putBytes(bytes).await()
+    }
+
+    actual suspend fun getBytes(maxDownloadSizeBytes: Long): ByteArray {
+        return android.getBytes(maxDownloadSizeBytes).await()
+    }
+
     actual suspend fun getDownloadUrl(): String {
         return android.downloadUrl.await().toString()
     }

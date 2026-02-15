@@ -9,9 +9,19 @@ import kotlin.coroutines.resumeWithException
 actual val Firebase.messaging: FirebaseMessaging
     get() = FirebaseMessaging(FIRMessaging.messaging())
 
+private object FirebaseMessagingIosState {
+    var autoInitEnabled: Boolean = true
+}
+
 actual class FirebaseMessaging internal constructor(
     internal val ios: FIRMessaging,
 ) {
+    actual var autoInitEnabled: Boolean
+        get() = FirebaseMessagingIosState.autoInitEnabled
+        set(value) {
+            FirebaseMessagingIosState.autoInitEnabled = value
+        }
+
     actual fun subscribeToTopic(topic: String) {
         ios.subscribeToTopic(topic)
     }

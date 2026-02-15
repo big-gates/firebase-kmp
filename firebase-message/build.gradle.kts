@@ -81,6 +81,7 @@ kotlin {
 
         jvmMain.dependencies {
             implementation(libs.firebase.admin)
+            implementation(libs.google.cloud.pubsub)
         }
 
         getByName("androidDeviceTest") {

@@ -3,12 +3,20 @@
 ## Module Purpose
 `firebase-common` provides multiplatform wrappers for Firebase app lifecycle and configuration (`Firebase`, `FirebaseApp`, `FirebaseOptions`).
 
+## Coverage Target
+1. This module is considered complete only when Firebase Core app/bootstrap API surface is near parity across Android/iOS/JVM.
+2. JVM Admin initialization and option mapping must remain compatible with growth in downstream modules (`message`, `storage`, future products).
+3. Public API coverage target for this module is 100% within Firebase Core scope, with explicit caveats only when official parity is impossible.
+4. Update README coverage status whenever `firebase-common` public API expands.
+5. Update `docs/public-api/firebase-common.md` in the same change.
+
 ## Key Files
 - `firebase-common/src/commonMain/kotlin/com/biggates/firebase/common/Firebase.kt`
 - `firebase-common/src/androidMain/kotlin/com/biggates/firebase/common/Firebase.android.kt`
 - `firebase-common/src/iosMain/kotlin/com/biggates/firebase/common/Firebase.ios.kt`
 - `firebase-common/src/jvmMain/kotlin/com/biggates/firebase/common/Firebase.jvm.kt`
 - `firebase-common/build.gradle.kts`
+- `docs/public-api/firebase-common.md`
 
 ## Ownership Boundary
 This module should only contain Firebase Core/bootstrap abstractions:

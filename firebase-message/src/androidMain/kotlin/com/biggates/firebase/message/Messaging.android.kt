@@ -10,6 +10,12 @@ actual val Firebase.messaging: FirebaseMessaging
 actual class FirebaseMessaging internal constructor(
     internal val android: AndroidFirebaseMessaging,
 ) {
+    actual var autoInitEnabled: Boolean
+        get() = android.isAutoInitEnabled
+        set(value) {
+            android.isAutoInitEnabled = value
+        }
+
     actual fun subscribeToTopic(topic: String) {
         android.subscribeToTopic(topic)
     }

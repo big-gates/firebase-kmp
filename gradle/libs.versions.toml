@@ -20,6 +20,7 @@ runner = "1.7.0"
 core = "1.7.0"
 firebase-bom = "34.4.0"
 firebase-admin = "9.7.0"
+google-cloud-pubsub = "1.136.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -41,6 +42,7 @@ firebase-common = { module = "com.google.firebase:firebase-common"}
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
 firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase-admin" }
+google-cloud-pubsub = { module = "com.google.cloud:google-cloud-pubsub", version.ref = "google-cloud-pubsub" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 
 [plugins]

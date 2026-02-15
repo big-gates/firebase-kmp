@@ -3,12 +3,20 @@
 ## Module Purpose
 `firebase-message` provides multiplatform wrappers for Firebase Cloud Messaging operations (`Firebase.messaging`, topic subscription, token lifecycle).
 
+## Coverage Target
+1. Long-term target is near parity with official Messaging APIs per platform.
+2. Coverage should expand beyond current topic/token subset (and JVM Pub/Sub consume path) in incremental, documented steps.
+3. Public API coverage target for this module is 100% within Messaging scope, with explicit caveats only when official parity is impossible.
+4. Update README coverage status whenever Messaging public API surface grows.
+5. Update `docs/public-api/firebase-message.md` in the same change.
+
 ## Key Files
 - `firebase-message/src/commonMain/kotlin/com/biggates/firebase/message/Messaging.kt`
 - `firebase-message/src/androidMain/kotlin/com/biggates/firebase/message/Messaging.android.kt`
 - `firebase-message/src/iosMain/kotlin/com/biggates/firebase/message/Messaging.ios.kt`
 - `firebase-message/src/jvmMain/kotlin/com/biggates/firebase/message/Messaging.jvm.kt`
 - `firebase-message/build.gradle.kts`
+- `docs/public-api/firebase-message.md`
 
 ## Dependency Boundary
 1. This module depends on `firebase-common` for shared Firebase app access.
@@ -19,6 +27,7 @@
 1. Start in `commonMain` with shared API changes.
 2. Implement Android, iOS, and JVM `actual` code in the same change.
 3. Keep function parity for:
+- `autoInitEnabled`
 - `subscribeToTopic`
 - `unsubscribeFromTopic`
 - `getToken`
@@ -39,7 +48,8 @@
 1. JVM target is backed by Firebase Admin SDK and requires explicit runtime configuration.
 2. Configure Admin SDK through `firebase-common` initialization (`Firebase.initializeApp(...)`) before using Messaging APIs.
 3. Provide registration token via `Firebase.setMessagingRegistrationToken(...)` because JVM cannot mint client FCM tokens.
-4. Keep JVM behavior explicit about server-side limitations versus mobile client SDK semantics.
+4. JVM data consume path should use Pub/Sub subscriber APIs (`Firebase.subscribeMessages(...)`) rather than pretending mobile push callbacks exist.
+5. Keep JVM behavior explicit about server-side limitations versus mobile client SDK semantics.
 
 ## Manifest And Tests
 1. Keep `firebase-message/src/androidMain/AndroidManifest.xml` minimal unless messaging integration requires declarations.

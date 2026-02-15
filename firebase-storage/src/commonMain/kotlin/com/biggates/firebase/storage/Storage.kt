@@ -47,6 +47,16 @@ expect class StorageReference {
 
     fun child(path: String): StorageReference
 
+    /**
+     * Uploads raw bytes to this object path, replacing existing object if it exists.
+     */
+    suspend fun putBytes(bytes: ByteArray)
+
+    /**
+     * Downloads object bytes up to [maxDownloadSizeBytes].
+     */
+    suspend fun getBytes(maxDownloadSizeBytes: Long): ByteArray
+
     suspend fun getDownloadUrl(): String
 
     suspend fun delete()

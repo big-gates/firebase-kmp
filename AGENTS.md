@@ -6,6 +6,25 @@ These instructions apply to the whole repository. Module-specific rules in `docs
 ## Project Mission
 `firebase-kmp` is an open-source Kotlin Multiplatform wrapper around official Firebase SDKs, so Firebase features can be used from shared KMP APIs.
 
+## Long-Term Goal
+1. Final goal: 100% Firebase API compatibility and 100% public API coverage for KMP (Android/iOS/JVM), with explicit platform caveats only when official SDK parity is impossible.
+2. Work should be planned and implemented toward full Firebase product-family coverage, not only currently available modules.
+3. Every public API expansion should move compatibility coverage forward in measurable terms.
+
+## Coverage Tracking Policy
+1. `README.md`, `README.en.md`, and `README.ko.md` must include current compatibility coverage status.
+2. Coverage is tracked at three levels:
+- Product-family coverage: implemented Firebase product modules / target product families.
+- Public API coverage: implemented public APIs / target public APIs (per product and per platform).
+- API-depth status per implemented module: `not started`, `partial`, `near parity`, or `parity`.
+3. Public API inventories must be maintained in:
+- `docs/public-api/firebase-common.md`
+- `docs/public-api/firebase-message.md`
+- `docs/public-api/firebase-storage.md`
+4. Any PR that changes public APIs or adds modules must update both:
+- README coverage sections.
+- The relevant files in `docs/public-api/`.
+
 ## Active Modules
 - `firebase-common`: core Firebase app/bootstrap abstractions.
 - `firebase-message`: Firebase Cloud Messaging abstractions.
@@ -67,4 +86,5 @@ When API surface or platform mapping changes:
 
 ## Documentation Maintenance
 1. Update `README.md` and affected files in `docs/agents/` whenever public APIs or setup flow changes.
-2. Add brief KDoc to new public APIs and document platform caveats.
+2. Update corresponding files in `docs/public-api/` whenever public API coverage changes.
+3. Add brief KDoc to new public APIs and document platform caveats.

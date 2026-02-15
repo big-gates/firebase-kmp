@@ -14,6 +14,13 @@ expect val Firebase.messaging: FirebaseMessaging
  */
 expect class FirebaseMessaging {
     /**
+     * Whether Firebase Messaging auto-init is enabled for this app.
+     *
+     * On JVM this controls local wrapper behavior only.
+     */
+    var autoInitEnabled: Boolean
+
+    /**
      * topic을 구독합니다.
      *
      * @param topic 구독할 topic 이름

@@ -7,6 +7,7 @@ import com.biggates.firebase.common.adminApp
 import com.biggates.firebase.common.app
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.storage.Blob
+import com.google.cloud.storage.BlobInfo
 import com.google.cloud.storage.Storage
 import com.google.cloud.storage.StorageOptions
 import com.google.firebase.cloud.StorageClient
@@ -200,6 +201,31 @@ actual class StorageReference internal constructor(
             emulatorHost = emulatorHost,
             emulatorPort = emulatorPort,
         )
+    }
+
+    actual suspend fun putBytes(bytes: ByteArray) {
+        require(objectPath.isNotBlank()) { "Cannot upload bytes to root storage reference." }
+
+        val service = FirebaseStorageJvmRuntime.storageService(Firebase.app, bucketName, emulatorHost, emulatorPort)
+        service.create(BlobInfo.newBuilder(bucketName, objectPath).build(), bytes)
+    }
+
+    actual suspend fun getBytes(maxDownloadSizeBytes: Long): ByteArray {
+        require(objectPath.isNotBlank()) { "Cannot download bytes for root storage reference." }
+        require(maxDownloadSizeBytes >= 0) { "maxDownloadSizeBytes must be non-negative." }
+
+        val service = FirebaseStorageJvmRuntime.storageService(Firebase.app, bucketName, emulatorHost, emulatorPort)
+        val blob = service.get(bucketName, objectPath)
+            ?: error("Storage object does not exist: gs://$bucketName/$objectPath")
+
+        if (blob.size > maxDownloadSizeBytes) {
+            error(
+                "Storage object exceeds maxDownloadSizeBytes: " +
+                    "size=${blob.size}, max=$maxDownloadSizeBytes, path=gs://$bucketName/$objectPath"
+            )
+        }
+
+        return blob.getContent()
     }
 
     actual suspend fun getDownloadUrl(): String {

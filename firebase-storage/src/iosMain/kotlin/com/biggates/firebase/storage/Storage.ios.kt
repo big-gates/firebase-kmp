@@ -3,7 +3,11 @@ package com.biggates.firebase.storage
 import cocoapods.FirebaseStorage.FIRStorage
 import cocoapods.FirebaseStorage.FIRStorageReference
 import com.biggates.firebase.common.Firebase
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.suspendCancellableCoroutine
+import platform.Foundation.NSData
+import platform.posix.memcpy
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -49,6 +53,25 @@ actual class StorageReference internal constructor(
         return StorageReference(ios.child(path))
     }
 
+    actual suspend fun putBytes(bytes: ByteArray) {
+        error("StorageReference.putBytes is not yet implemented on iOS target.")
+    }
+
+    actual suspend fun getBytes(maxDownloadSizeBytes: Long): ByteArray =
+        suspendCancellableCoroutine { cont ->
+            try {
+                ios.dataWithMaxSize(maxDownloadSizeBytes) { data, error ->
+                    if (error == null) {
+                        cont.resume(data?.toByteArray() ?: ByteArray(0))
+                    } else {
+                        cont.resumeWithException(Exception(error.toString()))
+                    }
+                }
+            } catch (e: Exception) {
+                cont.resumeWithException(e)
+            }
+        }
+
     actual suspend fun getDownloadUrl(): String =
         suspendCancellableCoroutine { cont ->
             try {
@@ -78,4 +101,19 @@ actual class StorageReference internal constructor(
                 cont.resumeWithException(e)
             }
         }
+}
+
+private fun NSData.toByteArray(): ByteArray {
+    val size = length.toInt()
+    if (size == 0) return ByteArray(0)
+
+    val out = ByteArray(size)
+    out.usePinned { pinned ->
+        memcpy(
+            pinned.addressOf(0),
+            bytes,
+            size.toULong(),
+        )
+    }
+    return out
 }
