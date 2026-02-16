@@ -2,11 +2,16 @@ package com.biggates.firebase.storage
 
 import cocoapods.FirebaseStorage.FIRStorage
 import cocoapods.FirebaseStorage.FIRStorageReference
+import cocoapods.FirebaseStorage.FIRStorageUploadTask
 import com.biggates.firebase.common.Firebase
+import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.UnsafeNumber
 import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.convert
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.Foundation.NSData
+import platform.Foundation.create
 import platform.posix.memcpy
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -21,8 +26,9 @@ actual fun Firebase.storage(url: String): FirebaseStorage {
 actual class FirebaseStorage internal constructor(
     internal val ios: FIRStorage,
 ) {
+    @OptIn(UnsafeNumber::class)
     actual fun useEmulator(host: String, port: Int) {
-        ios.useEmulatorWithHost(host = host, port = port.toLong())
+        ios.useEmulatorWithHost(host = host, port = port.convert())
     }
 
     actual val reference: StorageReference
@@ -54,7 +60,24 @@ actual class StorageReference internal constructor(
     }
 
     actual suspend fun putBytes(bytes: ByteArray) {
-        error("StorageReference.putBytes is not yet implemented on iOS target.")
+        suspendCancellableCoroutine { cont ->
+            try {
+                val data = bytes.toNSData()
+                val task: FIRStorageUploadTask = ios.putData(data, null) { _, error ->
+                    if (error == null) {
+                        cont.resume(Unit)
+                    } else {
+                        cont.resumeWithException(Exception(error.toString()))
+                    }
+                }
+
+                cont.invokeOnCancellation {
+                    task.cancel()
+                }
+            } catch (e: Exception) {
+                cont.resumeWithException(e)
+            }
+        }
     }
 
     actual suspend fun getBytes(maxDownloadSizeBytes: Long): ByteArray =
@@ -103,6 +126,7 @@ actual class StorageReference internal constructor(
         }
 }
 
+@OptIn(UnsafeNumber::class)
 private fun NSData.toByteArray(): ByteArray {
     val size = length.toInt()
     if (size == 0) return ByteArray(0)
@@ -112,8 +136,20 @@ private fun NSData.toByteArray(): ByteArray {
         memcpy(
             pinned.addressOf(0),
             bytes,
-            size.toULong(),
+            size.convert(),
         )
     }
     return out
+}
+
+@OptIn(BetaInteropApi::class, UnsafeNumber::class)
+private fun ByteArray.toNSData(): NSData {
+    if (isEmpty()) return NSData()
+
+    return usePinned { pinned ->
+        NSData.create(
+            bytes = pinned.addressOf(0),
+            length = size.convert(),
+        )
+    }
 }
