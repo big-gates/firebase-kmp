@@ -1,11 +1,11 @@
 # firebase-message agent guide
 
 ## Module Purpose
-`firebase-message` provides multiplatform wrappers for Firebase Cloud Messaging operations (`Firebase.messaging`, topic subscription, token lifecycle).
+`firebase-message` provides multiplatform wrappers for Firebase Cloud Messaging operations (`Firebase.messaging`, topic subscription, token lifecycle) on Android and Apple targets.
 
 ## Coverage Target
 1. Long-term target is near parity with official Messaging APIs per platform.
-2. Coverage should expand beyond current topic/token subset (and JVM Pub/Sub consume path) in incremental, documented steps.
+2. Coverage should expand beyond current topic/token subset in incremental, documented steps.
 3. Public API coverage target for this module is 100% within Messaging scope, with explicit caveats only when official parity is impossible.
 4. Update README coverage status whenever Messaging public API surface grows.
 5. Update `docs/public-api/firebase-message.md` in the same change.
@@ -14,7 +14,6 @@
 - `firebase-message/src/commonMain/kotlin/com/biggates/firebase/message/Messaging.kt`
 - `firebase-message/src/androidMain/kotlin/com/biggates/firebase/message/Messaging.android.kt`
 - `firebase-message/src/appleMain/kotlin/com/biggates/firebase/message/Messaging.apple.kt`
-- `firebase-message/src/jvmMain/kotlin/com/biggates/firebase/message/Messaging.jvm.kt`
 - `firebase-message/build.gradle.kts`
 - `docs/public-api/firebase-message.md`
 
@@ -25,7 +24,7 @@
 
 ## Change Workflow
 1. Start in `commonMain` with shared API changes.
-2. Implement Android, Apple, and JVM `actual` code in the same change.
+2. Implement Android and Apple `actual` code in the same change.
 3. Keep function parity for:
 - `autoInitEnabled`
 - `subscribeToTopic`
@@ -44,12 +43,9 @@
 3. Propagate errors with clear exceptions rather than swallowing them.
 4. Keep token nullability behavior explicit and documented.
 
-## JVM Rules
-1. JVM target is backed by Firebase Admin SDK and requires explicit runtime configuration.
-2. Configure Admin SDK through `firebase-common` initialization (`Firebase.initializeApp(...)`) before using Messaging APIs.
-3. Provide registration token via `Firebase.setMessagingRegistrationToken(...)` because JVM cannot mint client FCM tokens.
-4. JVM data consume path should use Pub/Sub subscriber APIs (`Firebase.subscribeMessages(...)`) rather than pretending mobile push callbacks exist.
-5. Keep JVM behavior explicit about server-side limitations versus mobile client SDK semantics.
+## JVM Support Policy
+1. `firebase-message` does not support JVM target currently.
+2. Do not add `jvmMain` sources or JVM-only APIs in this module until the policy changes.
 
 ## Manifest And Tests
 1. Keep `firebase-message/src/androidMain/AndroidManifest.xml` minimal unless messaging integration requires declarations.
@@ -64,5 +60,4 @@
 ## Validation Commands
 - `./gradlew :firebase-message:check`
 - `./gradlew :firebase-message:assemble`
-- `./gradlew :firebase-message:compileKotlinJvm`
 - `./gradlew :firebase-message:publishToMavenLocal` (optional pre-release validation)

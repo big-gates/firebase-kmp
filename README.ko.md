@@ -9,14 +9,14 @@ Firebase API를 Kotlin Multiplatform(Android/Apple/JVM) 공통 코드에서 사�
 ## 왜 firebase-kmp인가?
 - KMP 공유 코드에서 Firebase API를 Firebase 스타일로 사용할 수 있습니다.
 - Android, Apple, JVM 동작을 가능한 범위에서 일관되게 맞춥니다.
-- JVM 서버 사이드 워크플로우를 Firebase Admin SDK 기반으로 지원합니다.
+- JVM 타겟을 제공하는 모듈에서 서버 사이드 워크플로우를 지원합니다.
 
 ## 모듈 매트릭스
 
 | 모듈 | Firebase 제품군 | 현재 범위 | Public API 커버리지 | 상태 |
 | --- | --- | --- | --- | --- |
 | `firebase-common` | Core | 앱 초기화, 앱 인스턴스, 옵션, 앱 레지스트리 | `21 / 25 = 84.0%` | `partial` |
-| `firebase-message` | Cloud Messaging | topic/token API + JVM Pub/Sub 구독/발행 + JVM 전송 API | `19 / 36 = 52.8%` | `partial` |
+| `firebase-message` | Cloud Messaging | topic/token API (Android/Apple 전용, JVM 미지원) | `6 / 18 = 33.3%` | `partial` |
 | `firebase-storage` | Cloud Storage | 스토리지 레퍼런스 API + 바이트/다운로드/삭제 (참고 사항 확인) | `13 / 31 = 41.9%` | `partial` |
 
 ## 타겟
@@ -29,8 +29,9 @@ Firebase API를 Kotlin Multiplatform(Android/Apple/JVM) 공통 코드에서 사�
 
 참고:
 - visionOS 타겟은 Firebase SDK 호환성과 KMP interop 안정성 검증 후 확장 예정입니다.
+- `firebase-message` 모듈은 현재 Android/Apple 타겟만 지원합니다.
 
-## API 호환 커버리지 (업데이트: 2026-02-15)
+## API 호환 커버리지 (업데이트: 2026-02-16)
 
 목표:
 - KMP 기준 Firebase API 호환 커버리지 `100%`
@@ -48,7 +49,7 @@ Firebase API를 Kotlin Multiplatform(Android/Apple/JVM) 공통 코드에서 사�
 | 모듈 | 커버리지 | 카탈로그 |
 | --- | --- | --- |
 | `firebase-common` | `21 / 25 = 84.0%` | [`docs/public-api/firebase-common.md`](docs/public-api/firebase-common.md) |
-| `firebase-message` | `19 / 36 = 52.8%` | [`docs/public-api/firebase-message.md`](docs/public-api/firebase-message.md) |
+| `firebase-message` | `6 / 18 = 33.3%` | [`docs/public-api/firebase-message.md`](docs/public-api/firebase-message.md) |
 | `firebase-storage` | `13 / 31 = 41.9%` | [`docs/public-api/firebase-storage.md`](docs/public-api/firebase-storage.md) |
 
 목표 제품군 (18개):
@@ -89,69 +90,11 @@ fun initFirebaseOnJvm() {
 }
 ```
 
-### 2) Messaging (Topic + Token + FCM 전송)
+### 2) JVM에서 Messaging
 
-```kotlin
-import com.biggates.firebase.common.Firebase
-import com.biggates.firebase.message.FirebaseJvmFcmMessage
-import com.biggates.firebase.message.messaging
-import com.biggates.firebase.message.sendMessage
-import com.biggates.firebase.message.setMessagingRegistrationToken
+`firebase-message`는 현재 JVM 타겟 API를 제공하지 않습니다. Messaging API는 Android/Apple 타겟에서 사용하세요.
 
-suspend fun messagingJvmSample() {
-    Firebase.messaging.autoInitEnabled = true
-    Firebase.setMessagingRegistrationToken("fcm_registration_token")
-
-    Firebase.messaging.subscribeToTopic("news")
-    val token = Firebase.messaging.getToken()
-    Firebase.messaging.unsubscribeFromTopic("news")
-    Firebase.messaging.deleteToken()
-
-    Firebase.sendMessage(
-        FirebaseJvmFcmMessage(
-            topic = "news",
-            data = mapOf("source" to "jvm", "message" to "hello")
-        )
-    )
-}
-```
-
-### 3) Pub/Sub 구독 + 발행
-
-```kotlin
-import com.biggates.firebase.common.Firebase
-import com.biggates.firebase.message.FirebaseJvmAckDecision
-import com.biggates.firebase.message.FirebaseJvmPubSubPublishConfig
-import com.biggates.firebase.message.FirebaseJvmPubSubSubscriberConfig
-import com.biggates.firebase.message.publishMessage
-import com.biggates.firebase.message.subscribeMessages
-
-fun startJvmPubSub() {
-    val subscription = Firebase.subscribeMessages(
-        subscriptionId = "news-subscription",
-        config = FirebaseJvmPubSubSubscriberConfig(
-            // 선택 사항. 에뮬레이터 사용 시: "localhost:8085"
-            endpoint = null
-        )
-    ) { message ->
-        println("messageId=${message.messageId}")
-        println("data=${message.dataUtf8}")
-        println("attributes=${message.attributes}")
-        FirebaseJvmAckDecision.ACK
-    }
-
-    Firebase.publishMessage(
-        topicId = "news-topic",
-        dataUtf8 = """{"type":"news","title":"hello from jvm"}""",
-        attributes = mapOf("channel" to "backend"),
-        config = FirebaseJvmPubSubPublishConfig(endpoint = null)
-    )
-
-    // subscription.stop()
-}
-```
-
-### 4) Storage (레퍼런스 + 바이트)
+### 3) Storage (레퍼런스 + 바이트)
 
 ```kotlin
 import com.biggates.firebase.common.Firebase
@@ -178,7 +121,7 @@ suspend fun storageJvmSample() {
 
 - JVM에서 `initializeApp(context)`만 호출하면 실패합니다. `initializeApp(context, options)`를 사용해야 합니다.
 - JVM에서 `serviceAccountPath`를 생략하면 ADC(Application Default Credentials)를 사용합니다.
-- JVM Pub/Sub API 사용 시 `projectId`가 필요합니다.
+- `firebase-message`는 현재 JVM 타겟을 지원하지 않습니다.
 - JVM 기본 `Firebase.storage` 사용 시 `storageBucket` 설정이 필요합니다.
 - `StorageReference.putBytes(...)`는 현재 iOS 타겟 구현이 진행 중입니다.
 
@@ -186,7 +129,7 @@ suspend fun storageJvmSample() {
 
 ```bash
 ./gradlew :firebase-common:check :firebase-message:check :firebase-storage:check
-./gradlew :firebase-common:compileKotlinJvm :firebase-message:compileKotlinJvm :firebase-storage:compileKotlinJvm
+./gradlew :firebase-common:compileKotlinJvm :firebase-storage:compileKotlinJvm
 ```
 
 ## 프로젝트 문서

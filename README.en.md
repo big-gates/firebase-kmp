@@ -9,14 +9,14 @@ Language:
 ## Why firebase-kmp?
 - Use Firebase from shared KMP code with Firebase-like APIs.
 - Keep Android, Apple, and JVM behavior aligned as much as possible.
-- Support JVM server-side workflows with Firebase Admin SDK.
+- Support JVM server-side workflows in modules that provide JVM targets.
 
 ## Module Matrix
 
 | Module | Firebase Product | Current Scope | Public API Coverage | Status |
 | --- | --- | --- | --- | --- |
 | `firebase-common` | Core | App init, app instance, options, app registry | `21 / 25 = 84.0%` | `partial` |
-| `firebase-message` | Cloud Messaging | Topic/token APIs + JVM Pub/Sub consume/publish + JVM send APIs | `19 / 36 = 52.8%` | `partial` |
+| `firebase-message` | Cloud Messaging | Topic/token APIs (Android/Apple only, JVM unsupported) | `6 / 18 = 33.3%` | `partial` |
 | `firebase-storage` | Cloud Storage | Storage reference APIs + bytes/download/delete (see notes) | `13 / 31 = 41.9%` | `partial` |
 
 ## Targets
@@ -29,8 +29,9 @@ Language:
 
 Note:
 - visionOS target is planned once Firebase SDK parity and KMP interop stability are verified.
+- `firebase-message` currently supports Android/Apple targets only.
 
-## Compatibility Coverage (Updated: 2026-02-15)
+## Compatibility Coverage (Updated: 2026-02-16)
 
 Goal:
 - `100%` Firebase API compatibility coverage for KMP.
@@ -48,7 +49,7 @@ Current snapshot:
 | Module | Coverage | Catalog |
 | --- | --- | --- |
 | `firebase-common` | `21 / 25 = 84.0%` | [`docs/public-api/firebase-common.md`](docs/public-api/firebase-common.md) |
-| `firebase-message` | `19 / 36 = 52.8%` | [`docs/public-api/firebase-message.md`](docs/public-api/firebase-message.md) |
+| `firebase-message` | `6 / 18 = 33.3%` | [`docs/public-api/firebase-message.md`](docs/public-api/firebase-message.md) |
 | `firebase-storage` | `13 / 31 = 41.9%` | [`docs/public-api/firebase-storage.md`](docs/public-api/firebase-storage.md) |
 
 Target product families (18):
@@ -89,69 +90,11 @@ fun initFirebaseOnJvm() {
 }
 ```
 
-### 2) Messaging (Topic + Token + FCM Send)
+### 2) Messaging on JVM
 
-```kotlin
-import com.biggates.firebase.common.Firebase
-import com.biggates.firebase.message.FirebaseJvmFcmMessage
-import com.biggates.firebase.message.messaging
-import com.biggates.firebase.message.sendMessage
-import com.biggates.firebase.message.setMessagingRegistrationToken
+`firebase-message` does not provide a JVM target at this time. Use Android/Apple targets for Messaging APIs.
 
-suspend fun messagingJvmSample() {
-    Firebase.messaging.autoInitEnabled = true
-    Firebase.setMessagingRegistrationToken("fcm_registration_token")
-
-    Firebase.messaging.subscribeToTopic("news")
-    val token = Firebase.messaging.getToken()
-    Firebase.messaging.unsubscribeFromTopic("news")
-    Firebase.messaging.deleteToken()
-
-    Firebase.sendMessage(
-        FirebaseJvmFcmMessage(
-            topic = "news",
-            data = mapOf("source" to "jvm", "message" to "hello")
-        )
-    )
-}
-```
-
-### 3) Pub/Sub Consume + Publish
-
-```kotlin
-import com.biggates.firebase.common.Firebase
-import com.biggates.firebase.message.FirebaseJvmAckDecision
-import com.biggates.firebase.message.FirebaseJvmPubSubPublishConfig
-import com.biggates.firebase.message.FirebaseJvmPubSubSubscriberConfig
-import com.biggates.firebase.message.publishMessage
-import com.biggates.firebase.message.subscribeMessages
-
-fun startJvmPubSub() {
-    val subscription = Firebase.subscribeMessages(
-        subscriptionId = "news-subscription",
-        config = FirebaseJvmPubSubSubscriberConfig(
-            // Optional. For emulator: "localhost:8085"
-            endpoint = null
-        )
-    ) { message ->
-        println("messageId=${message.messageId}")
-        println("data=${message.dataUtf8}")
-        println("attributes=${message.attributes}")
-        FirebaseJvmAckDecision.ACK
-    }
-
-    Firebase.publishMessage(
-        topicId = "news-topic",
-        dataUtf8 = """{"type":"news","title":"hello from jvm"}""",
-        attributes = mapOf("channel" to "backend"),
-        config = FirebaseJvmPubSubPublishConfig(endpoint = null)
-    )
-
-    // subscription.stop()
-}
-```
-
-### 4) Storage (Reference + Bytes)
+### 3) Storage (Reference + Bytes)
 
 ```kotlin
 import com.biggates.firebase.common.Firebase
@@ -178,7 +121,7 @@ suspend fun storageJvmSample() {
 
 - On JVM, calling only `initializeApp(context)` fails. Use `initializeApp(context, options)`.
 - If `serviceAccountPath` is omitted on JVM, ADC (Application Default Credentials) is used.
-- `projectId` is required for JVM Pub/Sub APIs.
+- `firebase-message` does not support JVM target currently.
 - `storageBucket` is required when using default `Firebase.storage` on JVM.
 - `StorageReference.putBytes(...)` is currently pending on iOS target.
 
@@ -186,7 +129,7 @@ suspend fun storageJvmSample() {
 
 ```bash
 ./gradlew :firebase-common:check :firebase-message:check :firebase-storage:check
-./gradlew :firebase-common:compileKotlinJvm :firebase-message:compileKotlinJvm :firebase-storage:compileKotlinJvm
+./gradlew :firebase-common:compileKotlinJvm :firebase-storage:compileKotlinJvm
 ```
 
 ## Project Docs

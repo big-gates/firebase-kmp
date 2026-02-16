@@ -23,11 +23,13 @@ kotlin {
         }.configure {
             instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
-    }
 
-    jvm {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+        compilations.configureEach {
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_17)
+                }
+            }
         }
     }
 
@@ -87,11 +89,6 @@ kotlin {
             implementation(libs.kotlin.test)
         }
 
-        jvmMain.dependencies {
-            implementation(libs.firebase.admin)
-            implementation(libs.google.cloud.pubsub)
-        }
-
         getByName("androidDeviceTest") {
             dependencies {
                 implementation(libs.androidx.runner)
@@ -118,7 +115,7 @@ mavenPublishing {
 
     pom {
         name = "Firebase Message (Kotlin Multiplatform)"
-        description = "KMP bindings/wrappers for Firebase Message (Android/Apple/JVM)."
+        description = "KMP bindings/wrappers for Firebase Message (Android/Apple)."
         inceptionYear = "2025"
         url = "https://github.com/big-gates/firebase-kmp"
 

@@ -27,7 +27,7 @@ These instructions apply to the whole repository. Module-specific rules in `docs
 
 ## Active Modules
 - `firebase-common`: core Firebase app/bootstrap abstractions.
-- `firebase-message`: Firebase Cloud Messaging abstractions.
+- `firebase-message`: Firebase Cloud Messaging abstractions (Android/Apple only; JVM currently unsupported).
 - `firebase-storage`: Firebase Storage abstractions.
 
 Reference module guides:
@@ -38,8 +38,8 @@ Reference module guides:
 ## Core Engineering Rules
 1. Keep wrappers thin and predictable.
 2. Define shared API in `commonMain` first (`expect`, data models, extension properties/functions).
-3. Implement platform behavior in `androidMain`, Apple source sets (`appleMain`/target mains), and `jvmMain`.
-4. Maintain Android/Apple/JVM behavior parity as much as possible. If parity is impossible, document the difference in KDoc and module docs.
+3. Implement platform behavior in every active target for that module (`androidMain`, Apple source sets, and `jvmMain` where supported).
+4. Maintain target parity as much as possible. If parity is impossible, document the difference in KDoc and module docs.
 5. Do not add app-level/business logic to this library.
 
 ## API Design Rules
@@ -52,14 +52,14 @@ Reference module guides:
 ## Platform Interop Rules
 1. Android code should use Firebase Android SDK with the module's BOM-based dependency setup.
 2. Apple-native code should use CocoaPods interop APIs declared in each module.
-3. JVM code should use explicit runtime configuration when backed by Admin/Cloud SDKs, and document behavior differences from mobile client SDKs.
+3. For modules that support JVM, use explicit runtime configuration when backed by Admin/Cloud SDKs, and document behavior differences from mobile client SDKs.
 4. Avoid introducing new force unwrap patterns in Apple source sets; handle nullable results defensively.
 5. When adding option/config fields, update all relevant platform mappings in the same change.
 
 ## Dependency And Build Rules
 1. Keep versions centralized in `gradle/libs.versions.toml`.
 2. Keep Android BOM and Apple CocoaPods versions aligned to a compatible Firebase generation.
-3. Maintain Kotlin Multiplatform target setup already present in each module (`android`, `jvm`, `ios*`, `macos*`, `tvos*`, `watchos*`).
+3. Maintain Kotlin Multiplatform target setup already present in each module; follow documented module exceptions (for example, `firebase-message` has no JVM target).
 4. Keep Java/Kotlin target compatibility at JVM 17 unless the project intentionally upgrades.
 
 ## Testing And Verification
@@ -68,12 +68,11 @@ Run checks for touched modules before submitting:
 - `./gradlew :firebase-message:check`
 - `./gradlew :firebase-storage:check`
 - `./gradlew :firebase-common:compileKotlinJvm`
-- `./gradlew :firebase-message:compileKotlinJvm`
 - `./gradlew :firebase-storage:compileKotlinJvm`
 
 When API surface or platform mapping changes:
 1. Add or update tests in relevant source sets.
-2. Validate compile targets at minimum (Android + Apple + JVM source sets).
+2. Validate compile targets at minimum for the module's active targets (Android/Apple, plus JVM where supported).
 
 ## Publishing Rules
 1. Artifacts are published via `com.vanniktech.maven.publish`.
